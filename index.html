@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
+  <title>Cadavre exquis</title>
+  <link rel="icon" type="image/x-icon" href="images/mouche.png">
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="top">
+    <div class="top-left">
+      <p class="navigation"><a href="complet.html">Voir les textes terminés</a></p>
+    </div>
+    <div class="top-right">
+      <img src="images/mouche.png">
+    </div>
+  </div>
+
+  <div id="zone-texte-en-cours">
+    <div id="texte-en-cours">
+      <!-- Zone de visualisation des phrases en cours -->
+      <div id="dernieres-phrases">
+        <!-- les phrases censurées s'afficheront ici -->
+      </div>
+
+      <!-- Zone de saisie -->
+      <textarea id="phrase-input" rows="4" placeholder="Écris une phrase..."></textarea>
+      <div id="poster-et-tooltip">
+        <label for="poster-btn" id="label-poster-btn">Poster</label>
+        <button id="poster-btn" style="display:none;">Poster</button>
+        <p class="tooltip">"
+          <span>
+            En utilisant ce site, vous acceptez de ne pas publier de contenu offensant.
+            Vous êtes entièrement responsable de ce que vous partagez.
+            Tout contenu peut être supprimé à tout moment, sans justification. 
+            <br>
+            <br>
+            Contact : manonbip0@gmail.com
+          </span>
+        </p>
+    </div>
+    </div>
+  </div>
+
+  <!-- Firebase + scripts -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

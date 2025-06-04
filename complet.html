@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cadavre exquis</title>
+  <link rel="icon" type="image/x-icon" href="images/mouche.png">
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="top">
+    <div class="top-left">
+      <p class="navigation"><a href="index.html">Retour</a></p>
+    </div>
+    <div class="top-right">
+      <img src="images/mouche.png">
+    </div>
+  </div>
+
+  <div id="zone-textes-complets">
+    <div id="textes-complets">
+      <!-- Zone de visualisation des textes complets -->
+    </div>
+  </div>
+
+  <div id="bot">
+    <label for="generate-pdf-btn" id="print-btn">Imprimer</label>
+    <button id="generate-pdf-btn" style="display:none;">Imprimer</button>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="complet.js"></script>
+</body>
+</html>
