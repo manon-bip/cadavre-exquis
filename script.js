@@ -64,25 +64,53 @@ const soumettrePhrase = () => {
   const texte = phraseInput.value.trim();
   if (!texte) return;
 
-  phrases.push(texte);
+  const actuelRef = db.ref("actuel");
 
-  if (phrases.length >= 5) {
-    db.ref("complets").push({
-      id: currentId,
-      phrases: phrases,
-      timestamp: Date.now()
-    });
-    db.ref("actuel").set({
-      id: Date.now(),
-      phrases: []
-    });
-    alert("Merci ! Le texte est maintenant complet !");
-  } else {
-    db.ref("actuel/phrases").set(phrases);
-  }
+  actuelRef.transaction((actuel) => {
+    if (actuel) {
+      if (!actuel.phrases) {
+        actuel.phrases = [];
+      }
 
-  phraseInput.value = "";
-  chargerPhrases();
+      // Vérifie si le texte est déjà complet
+      if (actuel.phrases.length >= 5) {
+        // Crée un nouveau texte avec la phrase actuelle
+        const newId = Date.now();
+        db.ref("complets").push({
+          id: actuel.id,
+          phrases: actuel.phrases,
+          timestamp: Date.now()
+        });
+        return {
+          id: newId,
+          phrases: [texte]
+        };
+      } else {
+        // Ajoute la phrase au texte actuel
+        actuel.phrases.push(texte);
+        return actuel;
+      }
+    } else {
+      // Initialise le texte avec la première phrase
+      return {
+        id: Date.now(),
+        phrases: [texte]
+      };
+    }
+  }, (error, committed, snapshot) => {
+    if (error) {
+      console.error("Transaction échouée : ", error);
+    } else if (!committed) {
+      console.log("Transaction non appliquée.");
+    } else {
+      const data = snapshot.val();
+      if (data.phrases.length === 5) {
+        alert("Merci ! Le texte est maintenant complet !");
+      }
+      phraseInput.value = "";
+      chargerPhrases();
+    }
+  });
 };
 
 posterBtn.onclick = soumettrePhrase;

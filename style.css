@@ -178,7 +178,7 @@ body {
 #textes-complets {
   height: 100vh;
 
-  margin-top: 20vh;
+  margin: 20vh 0.5rem 0 0.5rem;
 
   display: flex;
   flex-wrap: wrap;
