@@ -21,6 +21,8 @@ const censurerPhrase = (phrase) => {
 const afficherPhrases = () => {
   dernieresPhrasesDiv.innerHTML = ""; // on vide avant de réafficher
 
+  if (phrases.length === 0) return;
+
   phrases.forEach((phrase, index) => {
     const wrapper = document.createElement("div");
     wrapper.className = "bloc-phrase";
@@ -48,12 +50,15 @@ const afficherPhrases = () => {
 const chargerPhrases = () => {
   db.ref("actuel").once("value", snapshot => {
     const data = snapshot.val();
-    if (data) {
+    if (data && data.phrases && data.phrases.length < 5) {
       currentId = data.id || Date.now();
       phrases = data.phrases || [];
       afficherPhrases();
     } else {
+      // Soit le texte est déjà complet (5 phrases), soit aucun n'existe encore
       currentId = Date.now();
+      phrases = [];
+      afficherPhrases(); // vide l’affichage
       db.ref("actuel").set({ id: currentId, phrases: [] });
     }
   });
@@ -67,36 +72,22 @@ const soumettrePhrase = () => {
   const actuelRef = db.ref("actuel");
 
   actuelRef.transaction((actuel) => {
-    if (actuel) {
-      if (!actuel.phrases) {
-        actuel.phrases = [];
-      }
-
-      // Vérifie si le texte est déjà complet
-      if (actuel.phrases.length >= 5) {
-        // Crée un nouveau texte avec la phrase actuelle
-        const newId = Date.now();
-        db.ref("complets").push({
-          id: actuel.id,
-          phrases: actuel.phrases,
-          timestamp: Date.now()
-        });
-        return {
-          id: newId,
-          phrases: [texte]
-        };
-      } else {
-        // Ajoute la phrase au texte actuel
-        actuel.phrases.push(texte);
-        return actuel;
-      }
-    } else {
-      // Initialise le texte avec la première phrase
+    if (!actuel) {
       return {
         id: Date.now(),
         phrases: [texte]
       };
     }
+
+    if (!actuel.phrases) {
+      actuel.phrases = [];
+    }
+
+    if (actuel.phrases.length < 5) {
+      actuel.phrases.push(texte);
+    }
+
+    return actuel;
   }, (error, committed, snapshot) => {
     if (error) {
       console.error("Transaction échouée : ", error);
@@ -104,11 +95,26 @@ const soumettrePhrase = () => {
       console.log("Transaction non appliquée.");
     } else {
       const data = snapshot.val();
+
+      // Si on a maintenant 5 phrases, envoyer vers 'complets' et réinitialiser
       if (data.phrases.length === 5) {
-        alert("Merci ! Le texte est maintenant complet !");
+        db.ref("complets").push({
+          id: data.id,
+          phrases: data.phrases,
+          timestamp: Date.now()
+        }).then(() => {
+          db.ref("actuel").set({
+            id: Date.now(),
+            phrases: []
+          });
+          alert("Merci ! Le texte est maintenant complet !");
+          phraseInput.value = "";
+          chargerPhrases(); // vide l'affichage
+        });
+      } else {
+        phraseInput.value = "";
+        chargerPhrases(); // mise à jour normale
       }
-      phraseInput.value = "";
-      chargerPhrases();
     }
   });
 };
